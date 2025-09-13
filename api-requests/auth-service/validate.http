@@ -1,0 +1,7 @@
+### GET request to validate token
+GET http://localhost:4006/auth/validate
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlckB0ZXN0LmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1NzU4NzA2NiwiZXhwIjoxNzU3NjIzMDY2fQ.I3Vn3uS3P9p91A9aW5IgjnxnI9oN1tSZ-XFA9coIF8o
+
+
+
+###

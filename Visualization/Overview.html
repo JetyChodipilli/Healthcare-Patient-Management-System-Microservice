@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management System Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+        }
+
+        @keyframes data-flow {
+            0% { transform: translateX(-100%) scale(0); opacity: 0; }
+            50% { opacity: 1; transform: scale(1); }
+            100% { transform: translateX(100%) scale(0); opacity: 0; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .data-flow {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(45deg, #3b82f6, #06b6d4);
+            border-radius: 50%;
+            animation: data-flow 3s infinite;
+        }
+
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            z-index: 1;
+        }
+
+        .node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+        }
+
+        .node:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .docker-container {
+            background: linear-gradient(135deg, rgba(108, 117, 125, 0.1), rgba(108, 117, 125, 0.05));
+            border: 2px dashed #6c757d;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .docker-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(108, 117, 125, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .tech-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .connection-active {
+            background: linear-gradient(90deg, #3b82f6, #06b6d4, #3b82f6);
+            background-size: 200% 100%;
+            animation: flow 2s linear infinite;
+        }
+
+        @keyframes flow {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .arrow {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .arrow-line {
+            stroke: #3b82f6;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 5,5;
+            animation: dash 2s linear infinite;
+        }
+
+        .arrow-head {
+            fill: #3b82f6;
+        }
+
+        .arrow-active .arrow-line {
+            stroke: #06b6d4;
+            stroke-width: 3;
+            stroke-dasharray: none;
+            filter: drop-shadow(0 0 8px #06b6d4);
+        }
+
+        .arrow-active .arrow-head {
+            fill: #06b6d4;
+            filter: drop-shadow(0 0 8px #06b6d4);
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -10;
+            }
+        }
+
+        .arrow-label {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen p-8">
+<div class="max-w-7xl mx-auto">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Patient Management System Architecture
+        </h1>
+        <p class="text-gray-300">Interactive System Diagram with Real-time Data Flow</p>
+    </div>
+
+    <div class="relative bg-slate-800/50 backdrop-blur-sm rounded-3xl p-8 border border-slate-700">
+        <div class="mb-16">
+            <div class="flex justify-center">
+                <div class="node bg-gradient-to-br from-blue-400 to-blue-600 text-white p-6 rounded-2xl shadow-2xl float-animation"
+                     onclick="highlightConnections('client')">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🖥️</div>
+                        <div class="font-bold">Frontend Client</div>
+                        <div class="text-sm opacity-90">React/Vue</div>
+                    </div>
+                    <div class="tech-badge">WEB</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-16">
+            <div class="flex justify-center">
+                <div class="node bg-gradient-to-br from-green-400 to-green-600 text-white p-6 rounded-2xl shadow-2xl"
+                     onclick="highlightConnections('gateway')">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🚪</div>
+                        <div class="font-bold">API Gateway</div>
+                        <div class="text-sm opacity-90">Spring Cloud Gateway</div>
+                    </div>
+                    <div class="tech-badge">JAVA</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="docker-container p-8 mb-8">
+            <div class="absolute top-4 left-4 text-gray-500 font-bold text-sm">🐳 Docker Network</div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="node bg-gradient-to-br from-yellow-400 to-orange-500 text-white p-6 rounded-2xl shadow-2xl"
+                     onclick="highlightConnections('auth')">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🔐</div>
+                        <div class="font-bold">Auth Service</div>
+                        <div class="text-sm opacity-90">Spring Boot - JWT</div>
+                    </div>
+                    <div class="tech-badge">JWT</div>
+                </div>
+
+                <div class="node bg-gradient-to-br from-purple-400 to-purple-600 text-white p-6 rounded-2xl shadow-2xl pulse-glow"
+                     onclick="highlightConnections('patient')">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">👥</div>
+                        <div class="font-bold">Patient Service</div>
+                        <div class="text-sm opacity-90">Maven Java Project</div>
+                    </div>
+                    <div class="tech-badge">CORE</div>
+                </div>
+
+                <div class="node bg-gradient-to-br from-indigo-400 to-indigo-600 text-white p-6 rounded-2xl shadow-2xl"
+                     onclick="highlightConnections('billing')">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">💰</div>
+                        <div class="font-bold">Billing Service</div>
+                        <div class="text-sm opacity-90">Maven Java Project</div>
+                    </div>
+                    <div class="tech-badge">gRPC</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div class="node bg-gradient-to-br from-red-400 to-red-600 text-white p-6 rounded-2xl shadow-2xl"
+                     onclick="highlightConnections('kafka')">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">📡</div>
+                        <div class="font-bold">Kafka Topic</div>
+                        <div class="text-sm opacity-90">patients</div>
+                    </div>
+                    <div class="tech-badge">STREAM</div>
+                </div>
+
+                <div class="node bg-gradient-to-br from-teal-400 to-teal-600 text-white p-6 rounded-2xl shadow-2xl"
+                     onclick="highlightConnections('analytics')">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">📊</div>
+                        <div class="font-bold">Analytics Service</div>
+                        <div class="text-sm opacity-90">Maven Java Project</div>
+                    </div>
+                    <div class="tech-badge">ML</div>
+                </div>
+            </div>
+
+            <div class="flex justify-center">
+                <div class="node bg-gradient-to-br from-cyan-400 to-cyan-600 text-white p-6 rounded-2xl shadow-2xl"
+                     onclick="highlightConnections('database')">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🗄️</div>
+                        <div class="font-bold">PostgreSQL</div>
+                        <div class="text-sm opacity-90">Database</div>
+                    </div>
+                    <div class="tech-badge">SQL</div>
+                </div>
+            </div>
+        </div>
+
+        <svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 1;" viewBox="0 0 800 700">
+            <!-- Client to Gateway -->
+            <path id="arrow-client-gateway" class="arrow-line" d="M 400 100 L 400 180" marker-end="url(#arrowhead)"/>
+
+            <!-- Gateway to Auth -->
+            <path id="arrow-gateway-auth" class="arrow-line" d="M 350 220 Q 280 260 200 300" marker-end="url(#arrowhead)"/>
+
+            <!-- Gateway to Patient -->
+            <path id="arrow-gateway-patient" class="arrow-line" d="M 400 220 L 400 300" marker-end="url(#arrowhead)"/>
+
+            <!-- Patient to Kafka -->
+            <path id="arrow-patient-kafka" class="arrow-line" d="M 350 360 Q 280 400 200 440" marker-end="url(#arrowhead)"/>
+
+            <!-- Patient to Billing -->
+            <path id="arrow-patient-billing" class="arrow-line" d="M 450 360 Q 520 400 600 440" marker-end="url(#arrowhead)"/>
+
+            <!-- Kafka to Analytics -->
+            <path id="arrow-kafka-analytics" class="arrow-line" d="M 280 480 Q 350 500 450 520" marker-end="url(#arrowhead)"/>
+
+            <!-- Patient to Database -->
+            <path id="arrow-patient-database" class="arrow-line" d="M 400 400 L 400 560" marker-end="url(#arrowhead)"/>
+
+            <!-- Billing to Database -->
+            <path id="arrow-billing-database" class="arrow-line" d="M 550 480 Q 480 520 420 560" marker-end="url(#arrowhead)"/>
+
+            <!-- Analytics to Database -->
+            <path id="arrow-analytics-database" class="arrow-line" d="M 450 560 L 420 580" marker-end="url(#arrowhead)"/>
+
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                    <polygon class="arrow-head" points="0 0, 10 3.5, 0 7"/>
+                </marker>
+            </defs>
+        </svg>
+
+        <div id="connections"></div>
+    </div>
+
+    <div class="mt-8 bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700">
+        <h3 class="text-white font-bold mb-4">🎯 Interactive Features</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-300">
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
+                Click nodes to highlight connections
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-purple-500 rounded mr-2 pulse-glow"></div>
+                Core service (Patient Service)
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 border-2 border-dashed border-gray-500 rounded mr-2"></div>
+                Docker containerized services
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeConnections = [];
+
+    function highlightConnections(nodeType) {
+        clearHighlights();
+
+        const connections = {
+            client: {
+                nodes: ['gateway'],
+                arrows: ['arrow-client-gateway']
+            },
+            gateway: {
+                nodes: ['auth', 'patient'],
+                arrows: ['arrow-gateway-auth', 'arrow-gateway-patient']
+            },
+            auth: {
+                nodes: ['gateway'],
+                arrows: ['arrow-gateway-auth']
+            },
+            patient: {
+                nodes: ['kafka', 'billing', 'database'],
+                arrows: ['arrow-patient-kafka', 'arrow-patient-billing', 'arrow-patient-database']
+            },
+            kafka: {
+                nodes: ['analytics'],
+                arrows: ['arrow-kafka-analytics']
+            },
+            billing: {
+                nodes: ['database'],
+                arrows: ['arrow-billing-database']
+            },
+            analytics: {
+                nodes: ['database'],
+                arrows: ['arrow-analytics-database']
+            },
+            database: {
+                nodes: [],
+                arrows: []
+            }
+        };
+
+        highlightNode(nodeType);
+
+        if (connections[nodeType]) {
+            connections[nodeType].nodes.forEach(connectedNode => {
+                highlightNode(connectedNode);
+                createDataFlow(nodeType, connectedNode);
+            });
+
+            connections[nodeType].arrows.forEach(arrowId => {
+                highlightArrow(arrowId);
+            });
+        }
+
+        showConnectionInfo(nodeType, connections[nodeType]?.nodes || []);
+    }
+
+    function highlightNode(nodeType) {
+        const nodeSelectors = {
+            client: '[onclick*="client"]',
+            gateway: '[onclick*="gateway"]',
+            auth: '[onclick*="auth"]',
+            patient: '[onclick*="patient"]',
+            billing: '[onclick*="billing"]',
+            kafka: '[onclick*="kafka"]',
+            analytics: '[onclick*="analytics"]',
+            database: '[onclick*="database"]'
+        };
+
+        const node = document.querySelector(nodeSelectors[nodeType]);
+        if (node) {
+            node.style.transform = 'scale(1.1) translateY(-10px)';
+            node.style.boxShadow = '0 25px 50px rgba(59, 130, 246, 0.4)';
+            node.style.zIndex = '20';
+        }
+    }
+
+    function highlightArrow(arrowId) {
+        const arrow = document.getElementById(arrowId);
+        if (arrow) {
+            arrow.parentElement.classList.add('arrow-active');
+        }
+    }
+
+    function clearHighlights() {
+        const nodes = document.querySelectorAll('.node');
+        nodes.forEach(node => {
+            node.style.transform = '';
+            node.style.boxShadow = '';
+            node.style.zIndex = '';
+        });
+
+        const arrows = document.querySelectorAll('svg');
+        arrows.forEach(svg => {
+            svg.classList.remove('arrow-active');
+        });
+
+        const flows = document.querySelectorAll('.data-flow');
+        flows.forEach(flow => flow.remove());
+
+        const info = document.getElementById('connection-info');
+        if (info) info.remove();
+    }
+
+    function createDataFlow(from, to) {
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                const particle = document.createElement('div');
+                particle.className = 'data-flow';
+                particle.style.animationDelay = `${i * 0.5}s`;
+                document.body.appendChild(particle);
+
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 3000);
+            }, i * 200);
+        }
+    }
+
+    function showConnectionInfo(nodeType, connections) {
+        const info = document.createElement('div');
+        info.id = 'connection-info';
+        info.className = 'fixed top-4 right-4 bg-slate-800 text-white p-4 rounded-lg shadow-2xl border border-slate-600 z-50';
+        info.innerHTML = `
+                <h4 class="font-bold mb-2">🔗 ${nodeType.toUpperCase()} Connections</h4>
+                <ul class="text-sm">
+                    ${connections.map(conn => `<li class="mb-1">→ ${conn}</li>`).join('')}
+                </ul>
+                <button onclick="clearHighlights()" class="mt-2 bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs">
+                    Clear
+                </button>
+            `;
+        document.body.appendChild(info);
+    }
+
+    setInterval(() => {
+        const nodes = document.querySelectorAll('.node');
+        const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+        randomNode.style.animation = 'float 2s ease-in-out';
+        setTimeout(() => {
+            randomNode.style.animation = '';
+        }, 2000);
+    }, 5000);
+
+    setInterval(() => {
+        createDataFlow('patient', 'kafka');
+    }, 4000);
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.node') && !e.target.closest('#connection-info')) {
+            clearHighlights();
+        }
+    });
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e0585180d42cea',t:'MTc1NzY4OTk2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

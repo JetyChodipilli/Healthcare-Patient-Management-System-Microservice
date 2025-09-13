@@ -1,0 +1,16 @@
+### create a new Patient Data
+### POST request to save Patient Details
+POST http://localhost:4000/patients
+Content-Type: application/json
+
+
+{
+  "name": "Jetson Moses test  kafka account",
+  "email": "ts1tkafkaA12134@gmail.com",
+  "address": "my street",
+  "dateOfBirth": "2000-06-25",
+  "registeredDate": "2021-08-06"
+}
+
+
+###
