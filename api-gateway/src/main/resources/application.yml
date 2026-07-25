@@ -37,3 +37,6 @@ spring:
           filters:
             - RewritePath=/api-docs/auth,/v3/api-docs
 
+auth:
+  service:
+    url: ${AUTH_SERVICE_URL:http://localhost:4006}

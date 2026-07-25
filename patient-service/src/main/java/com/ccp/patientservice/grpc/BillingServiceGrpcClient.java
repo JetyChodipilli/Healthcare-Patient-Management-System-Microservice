@@ -25,7 +25,7 @@ public class BillingServiceGrpcClient {
     }
     public BillingResponse createBillingAccount(String patientId,
                                                 String name,String email){
-        BillingRequest request = BillingRequest.newBuilder().setName(name).setEmail(email).build();
+        BillingRequest request = BillingRequest.newBuilder().setPatientId(patientId).setName(name).setEmail(email).build();
         BillingResponse response = stub.createBillingAccount(request);
         log.info("Response from BillingServiceGrpc is {}", response);
         return response;
