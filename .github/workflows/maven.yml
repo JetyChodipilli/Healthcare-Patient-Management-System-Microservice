@@ -1,4 +1,3 @@
-# Java CI with Maven - auto-detects pom.xml location and uses mvnw if available
 name: Java CI with Maven
 
 on:
@@ -26,6 +25,21 @@ jobs:
           echo "Searching for pom.xml (excluding .github)..."
           find . -path './.github' -prune -o -name 'pom.xml' -print
 
+      - name: Detect Maven project
+        id: detect_pom
+        run: |
+          set -euo pipefail
+          echo "Searching for pom.xml (excluding .github)..."
+          POM_PATH=$(find . -path './.github' -prune -o -name 'pom.xml' -print | head -n 1 || true)
+          if [ -z "${POM_PATH:-}" ]; then
+            echo "ERROR: pom.xml not found in repository."
+            echo "Searched with: find . -path './.github' -prune -o -name 'pom.xml'"
+            exit 1
+          fi
+          POM_DIR=$(dirname "$POM_PATH")
+          echo "Found pom.xml at: $POM_PATH (project dir: $POM_DIR)"
+          echo "pom_dir=$POM_DIR" >> $GITHUB_OUTPUT
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -34,37 +48,23 @@ jobs:
           cache: maven
 
       - name: Build with Maven (auto-detect pom)
+        working-directory: ${{ steps.detect_pom.outputs.pom_dir }}
         shell: bash
         run: |
           set -euo pipefail
-
-          # Find the first pom.xml outside the .github folder
-          POM_PATH=$(find . -path './.github' -prune -o -name 'pom.xml' -print | head -n 1 || true)
-
-          if [ -z "${POM_PATH:-}" ]; then
-            echo "ERROR: pom.xml not found in repository."
-            echo "Searched with: find . -path './.github' -prune -o -name 'pom.xml'"
-            exit 1
+          echo "Building in $(pwd)"
+          if [ -f "./mvnw" ] && [ ! -x "./mvnw" ]; then
+            chmod +x ./mvnw
           fi
-
-          echo "Found pom.xml at: $POM_PATH"
-          POM_DIR=$(dirname "$POM_PATH")
-          echo "Using project directory: $POM_DIR"
-
-          # Make mvnw executable if present but not executable (helpful on some checkouts)
-          if [ -f "$POM_DIR/mvnw" ] && [ ! -x "$POM_DIR/mvnw" ]; then
-            chmod +x "$POM_DIR/mvnw"
-          fi
-
-          # Prefer project's maven wrapper if present
-          if [ -x "$POM_DIR/mvnw" ]; then
+          if [ -x "./mvnw" ]; then
             echo "Using Maven wrapper (mvnw) from project"
-            (cd "$POM_DIR" && ./mvnw -B package)
+            ./mvnw -B package
           else
             echo "Using system mvn"
-            (cd "$POM_DIR" && mvn -B package)
+            mvn -B package
           fi
 
       - name: Update dependency graph
         if: success()
         uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+        working-directory: ${{ steps.detect_pom.outputs.pom_dir }}
