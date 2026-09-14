@@ -1,17 +1,32 @@
-
 server:
-  port: 4005 # Gateway listens on port 4005
+  port: 4004 # Gateway listens on port 4004
+
+auth:
+  service:
+    url: http://auth-service:4005
 
 spring:
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
       routes:
         - id: auth-service-route
-          uri: http://auth-service:4006
+          uri: http://auth-service:4005
           predicates:
-            - Path= /auth/**
+            - Path=/auth/**
           filters:
             - StripPrefix=1
+
         # Route for /api/patients/** to patient-service
         - id: patient-service-route
           uri: http://patient-service:4000
@@ -20,7 +35,6 @@ spring:
           filters:
             - StripPrefix=1
             - JwtValidation
-
 
         # Route for /api/docs/patients to patient-service /v3/api-docs
         - id: api-docs-patient-route
@@ -31,12 +45,25 @@ spring:
             - RewritePath=/api-docs/patients,/v3/api-docs
 
         - id: api-docs-auth-route
-          uri: http://auth-service:4006
+          uri: http://auth-service:4005
           predicates:
-            - Path= /api-docs/auth
+            - Path=/api-docs/auth
           filters:
             - RewritePath=/api-docs/auth,/v3/api-docs
 
-auth:
-  service:
-    url: ${AUTH_SERVICE_URL:http://localhost:4006}
+        # Route for /api/ai/** to analytics-service
+        - id: analytics-service-route
+          uri: http://analytics-service:4002
+          predicates:
+            - Path=/api/ai/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        # Route for /api/billing/** to billing docs (gRPC internal — no REST exposure)
+        - id: api-docs-billing-route
+          uri: http://billing-service:9001
+          predicates:
+            - Path=/api-docs/billing
+          filters:
+            - RewritePath=/api-docs/billing,/v3/api-docs

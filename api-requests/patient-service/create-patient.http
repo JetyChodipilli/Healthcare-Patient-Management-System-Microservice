@@ -1,16 +1,14 @@
-### create a new Patient Data
-### POST request to save Patient Details
-POST http://localhost:4000/patients
+### Creates a new patient entity
+POST http://lb-7e648e08.elb.localhost.localstack.cloud:4004/api/patients
 Content-Type: application/json
-
+Authorization: Bearer {{token}}
 
 {
-  "name": "Jetson Moses test  kafka account",
-  "email": "ts1tkafkaA12134@gmail.com",
-  "address": "my street",
-  "dateOfBirth": "2000-06-25",
-  "registeredDate": "2021-08-06"
+  "name": "John Doe Kafka Test",
+  "email": "kafka_test11@example.com",
+  "address": "123 main street22",
+  "dateOfBirth": "1995-09-09",
+  "registeredDate": "2024-11-28"
 }
-
 
 ###

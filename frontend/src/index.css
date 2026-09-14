@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-[#030712] text-slate-100 font-sans antialiased selection:bg-cyan-500/30 selection:text-cyan-200 min-h-screen overflow-x-hidden;
+    background: radial-gradient(circle at 50% -20%, #0f172a 0%, #030712 55%, #020617 100%);
+    background-attachment: fixed;
+  }
+}
+
+/* ─── Antigravity Titanium Glass Cards ───────────────────────── */
+.glass-titanium {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(3, 7, 18, 0.9) 100%);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-titanium-hover {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-titanium-hover:hover {
+  border-color: rgba(6, 182, 212, 0.4);
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 0 40px 80px -15px rgba(6, 182, 212, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Glass Inputs */
+.glass-input-custom {
+  background: rgba(2, 6, 23, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-input-custom:focus {
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+  background: rgba(2, 6, 23, 0.95);
+  outline: none;
+}
+
+/* Custom Metallic Shimmer Button */
+.btn-shimmer-antigravity {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0891b2 0%, #0284c7 50%, #4f46e5 100%);
+}
+.btn-shimmer-antigravity::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 70%
+  );
+  transform: rotate(30deg);
+  transition: all 0.8s ease;
+  opacity: 0;
+}
+.btn-shimmer-antigravity:hover::after {
+  left: 100%;
+  opacity: 1;
+}
+
+/* Custom Pulsing Telemetry Glow */
+@keyframes telemetryPulse {
+  0%, 100% { border-color: rgba(6, 182, 212, 0.25); box-shadow: 0 0 20px rgba(6, 182, 212, 0.1); }
+  50% { border-color: rgba(99, 102, 241, 0.5); box-shadow: 0 0 35px rgba(99, 102, 241, 0.2); }
+}
+
+.animate-telemetry-glow {
+  animation: telemetryPulse 4s infinite ease-in-out;
+}

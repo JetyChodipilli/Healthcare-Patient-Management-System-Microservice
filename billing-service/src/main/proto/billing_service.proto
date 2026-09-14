@@ -1,7 +1,9 @@
 syntax = "proto3";
+
 option java_multiple_files = true;
 option java_package = "billing";
-service BillingService{
+
+service BillingService {
   rpc CreateBillingAccount (BillingRequest) returns (BillingResponse);
 }
 
@@ -9,7 +11,6 @@ message BillingRequest {
   string patientId = 1;
   string name = 2;
   string email = 3;
-
 }
 
 message BillingResponse {
