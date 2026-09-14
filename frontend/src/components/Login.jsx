@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, HeartPulse, Activity, KeyRound, CheckCircle2, UserCheck, Shield, Sparkles } from 'lucide-react';
+import { Mail, Lock, ArrowRight, HeartPulse, Activity, CheckCircle2, UserCheck, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 

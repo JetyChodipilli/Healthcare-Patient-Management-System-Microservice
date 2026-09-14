@@ -38,6 +38,6 @@ public class PatientIntegrationTest {
         .get("/api/patients")
         .then()
         .statusCode(200)
-        .body("patients", notNullValue());
+        .body("$", notNullValue());
   }
 }

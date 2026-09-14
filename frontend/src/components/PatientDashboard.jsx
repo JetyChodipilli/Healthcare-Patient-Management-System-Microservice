@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, DollarSign, Server, Search, Plus, TrendingUp, LogOut,
-  Stethoscope, HeartPulse, Send, FileText, Activity, Bed, Shield, Zap,
-  CheckCircle2, AlertCircle, RefreshCw, ChevronRight, Bell, Layers,
-  CreditCard, Sparkles, Filter, Download, ArrowUpRight, Cpu, Radio,
-  Clock, Check, Copy, UserCheck
+  Stethoscope, HeartPulse, Send, Activity, Bed,
+  RefreshCw, ChevronRight, ChevronLeft, Layers,
+  CreditCard, Sparkles, ArrowUpRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { Command } from 'cmdk';
-import { LineChart, Line, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 // Role styling and permissions
 const ROLE_CONFIG = {
@@ -123,6 +122,7 @@ export default function PatientDashboard({ token, role = 'STAFF', onLogout }) {
 
   useEffect(() => {
     fetchPatients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   // ── Add Patient Submission ────────────────────────────────────────────────
@@ -248,6 +248,13 @@ export default function PatientDashboard({ token, role = 'STAFF', onLogout }) {
               </div>
             )}
           </div>
+          <button
+            onClick={() => setSidebarCollapsed((c) => !c)}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer shrink-0"
+            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <ChevronLeft className={`h-4 w-4 transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
+          </button>
         </div>
 
         {/* Sidebar Nav Links */}
