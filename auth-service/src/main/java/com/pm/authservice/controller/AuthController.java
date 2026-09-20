@@ -40,9 +40,14 @@ public class AuthController {
 
   @Operation(summary = "Register a new user")
   @PostMapping("/register")
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> register(
       @RequestBody LoginRequestDTO loginRequestDTO) {
+
+    // Only one Admin exists (pre-provisioned). Disallow public registration as ADMIN.
+    if ("ADMIN".equalsIgnoreCase(loginRequestDTO.getRole())) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body("Administrator role cannot be registered publicly.");
+    }
 
     boolean success = authService.registerUser(
         loginRequestDTO.getEmail(),

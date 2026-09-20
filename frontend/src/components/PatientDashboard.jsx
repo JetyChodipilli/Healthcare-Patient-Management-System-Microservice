@@ -7,7 +7,6 @@ import {
   CreditCard, Sparkles, ArrowUpRight
 } from 'lucide-react';
 import { toast } from 'sonner';
-import confetti from 'canvas-confetti';
 import { Command } from 'cmdk';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
@@ -163,7 +162,6 @@ export default function PatientDashboard({ token, role = 'STAFF', onLogout }) {
     }
 
     setPatients((prev) => [patientRecord, ...prev]);
-    confetti({ particleCount: 70, spread: 65, origin: { y: 0.6 } });
     toast.success(`Patient ${patientRecord.name} registered into ${patientRecord.department}`);
     setShowAddModal(false);
     setNewPatient({
