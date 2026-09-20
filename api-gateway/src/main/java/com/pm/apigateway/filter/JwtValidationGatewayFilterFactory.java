@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Component
 public class JwtValidationGatewayFilterFactory extends
@@ -25,7 +26,7 @@ public class JwtValidationGatewayFilterFactory extends
       String token =
           exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
-      if(token == null || !token.startsWith("Bearer ")) {
+      if (token == null || !token.startsWith("Bearer ")) {
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         return exchange.getResponse().setComplete();
       }
@@ -35,11 +36,11 @@ public class JwtValidationGatewayFilterFactory extends
           .header(HttpHeaders.AUTHORIZATION, token)
           .retrieve()
           .toBodilessEntity()
-          .onErrorResume(org.springframework.web.reactive.function.client.WebClientResponseException.class, e -> {
+          .flatMap(response -> chain.filter(exchange))
+          .onErrorResume(e -> {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return exchange.getResponse().setComplete().then(reactor.core.publisher.Mono.empty());
-          })
-          .then(chain.filter(exchange));
+            return exchange.getResponse().setComplete();
+          });
     };
   }
 }

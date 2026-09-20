@@ -1,6 +1,12 @@
 package com.pm.patientservice.dto;
 
-public class PatientResponseDTO {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class PatientResponseDTO implements Serializable {
+  @Serial
+  private static final long serialVersionUID = 1L;
+
   private String id;
   private String name;
   private String email;
